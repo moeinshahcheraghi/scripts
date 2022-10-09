@@ -1,0 +1,1 @@
+helm install  monitoring prometheus-community/kube-prometheus-stack  -f values.yml  --set prometheusOperator.admissionWebhooks.enabled=false --set prometheusOperator.admissionWebhooks.patch.enabled=false --set prometheusOperator.tlsProxy.enabled=false --namespace monitoring
