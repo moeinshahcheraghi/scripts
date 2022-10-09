@@ -1,0 +1,55 @@
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: externalserver
+    release: externalserver
+  name: monitoring-externalserver-servers
+  namespace: monitoring
+spec:
+  type: ClusterIP
+  ports:
+    - name: metrics
+      port: 9100
+      targetPort: 9100
+
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  labels:
+    app: externalserver
+    release: externalserver
+  name: monitoring-externalserver-servers
+  namespace: monitoring
+subsets:
+  - addresses:
+      - ip: 192.168.5.3
+      - ip: 192.168.5.100
+      - ip: 192.168.5.51
+      - ip: 192.168.10.10
+    ports:
+      - name: metrics
+        port: 9100
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations:
+    meta.helm.sh/release-name: monitoring
+  labels:
+    jobLabel: node-exporter
+    release: monitoring
+  name: monitoring-externalserver
+  namespace: monitoring
+spec:
+  endpoints:
+    - interval: 30s
+      port: metrics
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  selector:
+    matchLabels:
+      app: externalserver
+      release: externalserver
